@@ -38,6 +38,6 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Iterable<OrderEntity> getOrdersByUserId(String userId) {
-        return null;
+        return orderRepository.findByUserId(userId);
     }
 }
