@@ -3,6 +3,7 @@ package my.ecommerce.orderservice.controller;
 import lombok.RequiredArgsConstructor;
 import my.ecommerce.orderservice.dto.OrderDto;
 import my.ecommerce.orderservice.jpa.OrderEntity;
+import my.ecommerce.orderservice.messagequeue.KafkaProducer;
 import my.ecommerce.orderservice.service.OrderService;
 import my.ecommerce.orderservice.vo.RequestOrder;
 import my.ecommerce.orderservice.vo.ResponseOrder;
@@ -22,6 +23,7 @@ import java.util.List;
 public class OrderController {
     private final Environment env;
     private final OrderService orderService;
+    private final KafkaProducer kafkaProducer;
 
     @GetMapping("/health_check")
     public String status() {
@@ -37,6 +39,8 @@ public class OrderController {
         OrderDto createdOrder = orderService.createOrder(orderDto);
 
         ResponseOrder responseOrder = mapper.map(createdOrder, ResponseOrder.class);
+
+        kafkaProducer.send("example-catalog-topic", orderDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseOrder);
     }
